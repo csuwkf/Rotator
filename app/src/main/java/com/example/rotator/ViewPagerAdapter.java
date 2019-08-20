@@ -15,8 +15,8 @@ import java.util.List;
  * @date 2019-08-19
  **/
 public class ViewPagerAdapter extends PagerAdapter {
-    private Context context; //上下文对象
-    private List<String> datas;// 数据源
+    private Context context;
+    private List<String> datas;
     private List<View> views;
 
     public ViewPagerAdapter(Context context, List<View> views, List<String> datas) {
@@ -31,8 +31,8 @@ public class ViewPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object o) {
-        return view == o;
+    public boolean isViewFromObject(View view, Object object) {
+        return view == object;
     }
 
     @Override
@@ -46,8 +46,8 @@ public class ViewPagerAdapter extends PagerAdapter {
         View view=views.get(position);
         try {
             String url=datas.get(position);
-            ImageView item_image = view.findViewById(R.id.item_image);
-            Glide.with(context).load(url).into(item_image);
+            ImageView itemImageView = view.findViewById(R.id.item_image);
+            Glide.with(context).load(url).into(itemImageView);
         }catch (Exception e){
             e.printStackTrace();
         }

@@ -1,4 +1,4 @@
-package com.example.rotator;
+package com.example.rotator.rotator;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +12,16 @@ import android.widget.LinearLayout;
 
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.rotator.R;
+import com.example.rotator.ViewPagerAdapter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.example.rotator.ConstUtils.AUDIO;
+import static com.example.rotator.ConstUtils.ROTATOR;
 
 /**
  * @author 吴科烽
@@ -26,10 +32,19 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
     private ViewPager viewPagerImage;
     private Context context;
     private LayoutInflater inflater;
-    private int timeout;       //间隔时间
-    List<View> viewList;      //装载图片的view列表
-    private ImageView[] dots; //圆点指示器
-    private int currentIndex; //当前索引
+    /**
+     * 间隔时间
+     */
+    private int timeout;
+    /**
+     * 装载图片的view列表
+     */
+    List<View> viewList;
+    /**
+     * 圆点指示器
+     */
+    private ImageView[] dots;
+    private int currentIndex;
 
     Timer timer;
     TimerTask timerTask;
@@ -55,14 +70,16 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
             viewPagerImage = view.findViewById(R.id.vp_board);
             viewPagerImage.setOnPageChangeListener(this);
             viewList = new ArrayList<>();
-            LinearLayout ll_board_dot = view.findViewById(R.id.ll_board_dot);
+            LinearLayout mLinearLayout = view.findViewById(R.id.ll_board_dot);
             for(int i = 0;i < datas.size();i++){
                 viewList.add(inflater.inflate(R.layout.viewpager_item_picture,null));
-                ll_board_dot.addView(inflater.inflate(R.layout.viewpager_board_dot,null));
+                mLinearLayout.addView(inflater.inflate(R.layout.viewpager_board_dot,null));
             }
-            initDots(ll_board_dot); //初始化点指示器
+            //初始化点指示器
+            initDots(mLinearLayout);
             ViewPagerAdapter adapter=new ViewPagerAdapter(context,viewList,datas);
-            viewPagerImage.setOffscreenPageLimit(100); //设置viewpager保留多少个显示界面
+            //设置viewpager保留多少个显示界面
+            viewPagerImage.setOffscreenPageLimit(100);
             viewPagerImage.setAdapter(adapter);
             timer = new Timer();
             timerTask = new TimerTask() {
@@ -80,22 +97,25 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
                     handler.sendMessage(msg);
                 }
             };
-            timer.schedule(timerTask,0,timeout); //定时切换页面
+            timer.schedule(timerTask,0,timeout);
             return  view;
     }
-    //初始化圆点
-    private void initDots(LinearLayout ll_board_dot) {
+
+    /**
+     * 初始化圆点
+     * @param linearLayout 布局
+     */
+    private void initDots(LinearLayout linearLayout) {
         dots = new ImageView[viewList.size()];
         //循环获取小圆点指示器
         for(int i=0;i<viewList.size();i++){
-            dots[i] = (ImageView)ll_board_dot.getChildAt(i);
+            dots[i] = (ImageView)linearLayout.getChildAt(i);
             dots[i].setEnabled(false);
         }
         currentIndex=0;
         dots[currentIndex].setEnabled(true);
     }
 
-    //当页面切换时，圆点也切换
     private void setCurrentDot(int currentPage) {
         if(currentPage<0||currentPage>viewList.size()-1||currentIndex==currentPage) {
             return;
@@ -120,8 +140,8 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
 
     private void sendAudioBroadcast(){
         Intent mIntent = new Intent();
-        mIntent.setAction("android.intent.action.rotator");
-        mIntent.putExtra("data","audio");
+        mIntent.setAction(ROTATOR);
+        mIntent.putExtra("data",AUDIO);
         Log.d(TAG,mIntent.getAction());
         context.sendBroadcast(mIntent);
     }

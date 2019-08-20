@@ -1,4 +1,4 @@
-package com.example.rotator;
+package com.example.rotator.rotator;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,7 +7,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+
+import com.example.rotator.R;
+
 import java.util.ArrayList;
+
+import static com.example.rotator.ConstUtils.ROTATOR;
+import static com.example.rotator.ConstUtils.VIDEO;
 
 /**
  * @author 吴科烽
@@ -19,7 +25,7 @@ public class AudioRotator {
     private ArrayList<String> audioList;
     private Context context;
     private LayoutInflater inflater;
-    private int audioIndex = 0;
+    private int audioIndex ;
     private ImageView imageView;
 
     public AudioRotator(Context context, LayoutInflater inflater, ArrayList<String> audioList) {
@@ -59,12 +65,14 @@ public class AudioRotator {
             mediaPlayer.setDataSource(audioList.get(audioIndex));
             mediaPlayer.prepare();
             mediaPlayer.start();
-        }catch (Exception e){}
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
     private void sendVideoBroadcast(){
         Intent mIntent = new Intent();
-        mIntent.setAction("android.intent.action.rotator");
-        mIntent.putExtra("data","video");
+        mIntent.setAction(ROTATOR);
+        mIntent.putExtra("data",VIDEO);
         context.sendBroadcast(mIntent);
         Log.d(TAG,mIntent.getAction());
     }
