@@ -33,6 +33,7 @@ import static com.example.rotator.ConstUtils.TIMEOUT;
 import static com.example.rotator.ConstUtils.TYPE_AUDIO_ARRAY_8386;
 import static com.example.rotator.ConstUtils.TYPE_VIDEO_ARRAY_8386;
 import static com.example.rotator.ConstUtils.VIDEO;
+
 /**
  * @author 吴科烽
  * @date 2019-08-19
@@ -58,29 +59,31 @@ public class MainActivity extends AppCompatActivity {
         receiver = new RotatorBroadcastReceiver();
         IntentFilter mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(ROTATOR);
-        registerReceiver(receiver,mIntentFilter);
+        registerReceiver(receiver, mIntentFilter);
         initVideoView();
     }
-    
+
     private void initImageView() {
         linearLayoutBoardViewpager.removeAllViews();
-        getFilePath(FILEPATH,ConstUtils.TYPE_IMAGE_ARRAY_8386,imagePathList);
-        linearLayoutBoardViewpager.addView(new ImageRotator(this,inflater,TIMEOUT).initView(imagePathList));
+        getFilePath(FILEPATH, ConstUtils.TYPE_IMAGE_ARRAY_8386, imagePathList);
+        linearLayoutBoardViewpager.addView(new ImageRotator(this, inflater, TIMEOUT).initView(imagePathList));
     }
+
     private void initVideoView() {
         linearLayoutBoardViewpager.removeAllViews();
-        getFilePath(FILEPATH,TYPE_VIDEO_ARRAY_8386,videoPathList);
-        linearLayoutBoardViewpager.addView(new VideoRotator(this,inflater,videoPathList).initView());
+        getFilePath(FILEPATH, TYPE_VIDEO_ARRAY_8386, videoPathList);
+        linearLayoutBoardViewpager.addView(new VideoRotator(this, inflater, videoPathList).initView());
     }
 
     private void initAudioView() {
         linearLayoutBoardViewpager.removeAllViews();
-        getFilePath(FILEPATH,TYPE_AUDIO_ARRAY_8386,audioPathList);
-        linearLayoutBoardViewpager.addView(new AudioRotator(this,inflater,audioPathList).initView());
+        getFilePath(FILEPATH, TYPE_AUDIO_ARRAY_8386, audioPathList);
+        linearLayoutBoardViewpager.addView(new AudioRotator(this, inflater, audioPathList).initView());
     }
 
     /**
      * 读写权限检查判断
+     *
      * @return 是否拥有权限
      */
     public boolean isStoragePermissionGranted() {
@@ -106,14 +109,15 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 文件夹下指定文件读取
+     *
      * @param filepath 文件夹路径
-     * @param type 指定文件类型
+     * @param type     指定文件类型
      * @param pathList 指定文件集合
      */
-    public void getFilePath(String filepath,String[] type,ArrayList<String> pathList){
+    public void getFilePath(String filepath, String[] type, ArrayList<String> pathList) {
         File mFile = new File(filepath);
         pathList.clear();
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) && isStoragePermissionGranted()) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) && isStoragePermissionGranted()) {
             if (mFile.isDirectory()) {
                 Log.d(TAG, filepath);
                 for (File fileUrl : Objects.requireNonNull(mFile.listFiles())) {
@@ -138,14 +142,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public class RotatorBroadcastReceiver extends BroadcastReceiver{
+    public class RotatorBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.d(TAG,action);
-            if(action.equals(ROTATOR)) {
+            Log.d(TAG, action);
+            if (action.equals(ROTATOR)) {
                 String str = intent.getStringExtra("data");
-                Log.d(TAG,str);
+                Log.d(TAG, str);
                 switch (str) {
                     case IMAGE:
                         initImageView();

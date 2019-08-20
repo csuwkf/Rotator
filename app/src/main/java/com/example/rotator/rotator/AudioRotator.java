@@ -25,7 +25,7 @@ public class AudioRotator {
     private ArrayList<String> audioList;
     private Context context;
     private LayoutInflater inflater;
-    private int audioIndex ;
+    private int audioIndex = 0;
     private ImageView imageView;
 
     public AudioRotator(Context context, LayoutInflater inflater, ArrayList<String> audioList) {
@@ -39,7 +39,7 @@ public class AudioRotator {
         imageView = view.findViewById(R.id.audio_play_background);
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-            public void onCompletion (MediaPlayer mediaPlayer){
+            public void onCompletion(MediaPlayer mediaPlayer) {
                 nextAudio();
             }
         });
@@ -59,22 +59,24 @@ public class AudioRotator {
             sendVideoBroadcast();
         }
     }
-    private void audioPlay(){
+
+    private void audioPlay() {
         try {
             mediaPlayer.reset();
             mediaPlayer.setDataSource(audioList.get(audioIndex));
             mediaPlayer.prepare();
             mediaPlayer.start();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    private void sendVideoBroadcast(){
+
+    private void sendVideoBroadcast() {
         Intent mIntent = new Intent();
         mIntent.setAction(ROTATOR);
-        mIntent.putExtra("data",VIDEO);
+        mIntent.putExtra("data", VIDEO);
         context.sendBroadcast(mIntent);
-        Log.d(TAG,mIntent.getAction());
+        Log.d(TAG, mIntent.getAction());
     }
 }
 

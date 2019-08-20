@@ -7,7 +7,8 @@ import android.os.Environment;
  * @date 2019-08-20
  **/
 public class ConstUtils {
-    private ConstUtils(){}
+    private ConstUtils() {
+    }
 
     public static final String ROTATOR = "android.intent.action.rotator";
     public static final String IMAGE = "image";

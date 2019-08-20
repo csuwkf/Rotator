@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+
 import androidx.annotation.RequiresApi;
 
 import com.example.rotator.R;
@@ -17,6 +18,12 @@ import com.example.rotator.R;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static com.example.rotator.ConstUtils.IMAGE;
 import static com.example.rotator.ConstUtils.ROTATOR;
@@ -25,7 +32,7 @@ import static com.example.rotator.ConstUtils.ROTATOR;
  * @author 吴科烽
  * @date 2019-08-19
  **/
-public class VideoRotator implements SurfaceHolder.Callback{
+public class VideoRotator implements SurfaceHolder.Callback {
     private static final String TAG = "VideoRotator";
     /**
      * cachePlayer:负责setNextMediaPlayer的player缓存对象
@@ -46,20 +53,23 @@ public class VideoRotator implements SurfaceHolder.Callback{
      */
     private int currentIndex = 0;
 
-    public VideoRotator(Context context, LayoutInflater inflater,ArrayList<String> videoList) {
+    public VideoRotator(Context context, LayoutInflater inflater, ArrayList<String> videoList) {
         this.context = context;
         this.inflater = inflater;
         this.videoList = videoList;
     }
-    public View initView(){
-        View view = inflater.inflate(R.layout.video_item,null);
+
+    public View initView() {
+        View view = inflater.inflate(R.layout.video_item, null);
         surfaceView = view.findViewById(R.id.surfaceview_video);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
-        return  view;
+        return view;
     }
+
     @Override
-    public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {}
+    public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder arg0) {
@@ -68,7 +78,8 @@ public class VideoRotator implements SurfaceHolder.Callback{
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder arg0) {}
+    public void surfaceDestroyed(SurfaceHolder arg0) {
+    }
 
     /**
      * 初始化播放首段视频的player
@@ -101,7 +112,11 @@ public class VideoRotator implements SurfaceHolder.Callback{
     }
 
     private void initNextPlayer() {
-        new Thread(new Runnable() {
+        ThreadPoolExecutor singleThreadExecutor = new ThreadPoolExecutor(
+                1, 1, 10, TimeUnit.SECONDS,
+                new ArrayBlockingQueue<Runnable>(1),
+                new ThreadPoolExecutor.DiscardOldestPolicy());
+        singleThreadExecutor.execute(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
             @Override
             public void run() {
@@ -125,14 +140,15 @@ public class VideoRotator implements SurfaceHolder.Callback{
                     playersCache.put(String.valueOf(i), nextMediaPlayer);
                 }
             }
-        }).start();
+        });
+        singleThreadExecutor.shutdown();
     }
 
 
     private void onVideoPlayCompleted(MediaPlayer mp) {
         mp.setDisplay(null);
         currentPlayer = playersCache.get(String.valueOf(++currentIndex));
-        if(currentIndex == videoList.size()){
+        if (currentIndex == videoList.size()) {
             onDestroy();
             sendImageBroadcast();
         }
@@ -162,13 +178,15 @@ public class VideoRotator implements SurfaceHolder.Callback{
             currentPlayer.release();
         }
         currentPlayer = null;
+        currentIndex = 0;
+        videoList.clear();
     }
 
-    private void sendImageBroadcast(){
+    private void sendImageBroadcast() {
         Intent mIntent = new Intent();
         mIntent.setAction(ROTATOR);
-        mIntent.putExtra("data",IMAGE);
-        Log.d(TAG,mIntent.getAction());
+        mIntent.putExtra("data", IMAGE);
+        Log.d(TAG, mIntent.getAction());
         context.sendBroadcast(mIntent);
     }
 
