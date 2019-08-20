@@ -5,7 +5,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -21,6 +24,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    private static final String ROTATOR = "android.intent.action.rotator";
     private static final String filePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/testwkf";
     private LayoutInflater inflater;
     private LinearLayout ll_board_viewpager;
@@ -31,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     //视频文件路径列表
     private ArrayList<String> videoPathList = new ArrayList<>();
     private File mFile;
-    private MediaPlayer mediaPlayer;
+    private BroadcastReceiver receiver;
 
     private static final String[] TYPE_IMAGE_ARRAY_8386 = new String[]{
             ".jpg", ".png", ".gif", ".jpeg", ".bmp"};
@@ -45,7 +49,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_activity);
         ll_board_viewpager = findViewById(R.id.ll_board_viewpager);
         inflater = LayoutInflater.from(this);
-        initAudioView();
+        receiver = new RotatorBroadcastReceiver();
+        IntentFilter mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(ROTATOR);
+        registerReceiver(receiver,mIntentFilter);
+        initVideoView();
     }
     
     private void initImageView() {
@@ -109,8 +117,32 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mediaPlayer.release();
-        mediaPlayer = null;
+        unregisterReceiver(receiver);
     }
 
+
+    public class RotatorBroadcastReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d(TAG,action);
+            if(action.equals(ROTATOR)) {
+                String str = intent.getStringExtra("data");
+                Log.d(TAG,str);
+                switch (str) {
+                    case "image":
+                        initImageView();
+                        break;
+                    case "audio":
+                        initAudioView();
+                        break;
+                    case "video":
+                        initVideoView();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
 }

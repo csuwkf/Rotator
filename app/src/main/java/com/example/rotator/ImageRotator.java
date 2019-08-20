@@ -1,8 +1,10 @@
 package com.example.rotator;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,6 +22,7 @@ import java.util.TimerTask;
  * @date 2019-08-19
  **/
 public class ImageRotator implements ViewPager.OnPageChangeListener {
+    private static final String TAG = "ImageRotator";
     private ViewPager viewPagerImage;
     private Context context;
     private LayoutInflater inflater;
@@ -61,13 +64,16 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
             ViewPagerAdapter adapter=new ViewPagerAdapter(context,viewList,datas);
             viewPagerImage.setOffscreenPageLimit(100); //设置viewpager保留多少个显示界面
             viewPagerImage.setAdapter(adapter);
-
             timer = new Timer();
             timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    int currentPage=count % datas.size();
+                    int currentPage = count;
                     count++;
+                    if(count > viewList.size()){
+                        timerTask.cancel();
+                        sendAudioBroadcast();
+                    }
                     Message msg = Message.obtain();
                     msg.what = 0;
                     msg.obj = currentPage;
@@ -111,4 +117,13 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
 
     @Override
     public void onPageScrollStateChanged(int i) {}
+
+    private void sendAudioBroadcast(){
+        Intent mIntent = new Intent();
+        mIntent.setAction("android.intent.action.rotator");
+        mIntent.putExtra("data","audio");
+        Log.d(TAG,mIntent.getAction());
+        context.sendBroadcast(mIntent);
+    }
+
 }
