@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(ROTATOR);
         registerReceiver(receiver, mIntentFilter);
-        initVideoView();
+        initImageView();
     }
 
     private void initImageView() {

@@ -3,6 +3,8 @@ package com.example.rotator;
 import android.os.Environment;
 
 /**
+ * 常量类
+ *
  * @author 吴科烽
  * @date 2019-08-20
  **/

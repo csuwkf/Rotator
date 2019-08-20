@@ -2,6 +2,8 @@ package com.example.rotator.rotator;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
@@ -10,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.RequiresApi;
 
@@ -29,6 +33,8 @@ import static com.example.rotator.ConstUtils.IMAGE;
 import static com.example.rotator.ConstUtils.ROTATOR;
 
 /**
+ * 视频轮播功能
+ *
  * @author 吴科烽
  * @date 2019-08-19
  **/
@@ -73,13 +79,13 @@ public class VideoRotator implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceCreated(SurfaceHolder arg0) {
-        //然后初始化播放手段视频的player对象
         initFirstPlayer();
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder arg0) {
     }
+
 
     /**
      * 初始化播放首段视频的player
@@ -90,17 +96,20 @@ public class VideoRotator implements SurfaceHolder.Callback {
         firstPlayer.setDisplay(surfaceHolder);
         firstPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-            public void onCompletion(MediaPlayer mp) {
-                onVideoPlayCompleted(mp);
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                onVideoPlayCompleted(mediaPlayer);
             }
         });
-        //设置cachePlayer为该player对象
+
         cachePlayer = firstPlayer;
         initNextPlayer();
-        //player对象初始化完成后，开启播放
+        //初始化完成后，开启播放
         startPlayFirstVideo();
     }
 
+    /**
+     * 播放第一段视频
+     */
     private void startPlayFirstVideo() {
         try {
             firstPlayer.setDataSource(videoList.get(currentIndex));
@@ -111,6 +120,9 @@ public class VideoRotator implements SurfaceHolder.Callback {
         }
     }
 
+    /**
+     * 缓冲下一段视频
+     */
     private void initNextPlayer() {
         ThreadPoolExecutor singleThreadExecutor = new ThreadPoolExecutor(
                 1, 1, 10, TimeUnit.SECONDS,
@@ -125,8 +137,8 @@ public class VideoRotator implements SurfaceHolder.Callback {
                     nextMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     nextMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                         @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            onVideoPlayCompleted(mp);
+                        public void onCompletion(MediaPlayer mediaPlayer) {
+                            onVideoPlayCompleted(mediaPlayer);
                         }
                     });
                     try {
@@ -144,9 +156,8 @@ public class VideoRotator implements SurfaceHolder.Callback {
         singleThreadExecutor.shutdown();
     }
 
-
-    private void onVideoPlayCompleted(MediaPlayer mp) {
-        mp.setDisplay(null);
+    private void onVideoPlayCompleted(MediaPlayer mediaPlayer) {
+        mediaPlayer.setDisplay(null);
         currentPlayer = playersCache.get(String.valueOf(++currentIndex));
         if (currentIndex == videoList.size()) {
             onDestroy();
@@ -156,6 +167,7 @@ public class VideoRotator implements SurfaceHolder.Callback {
             currentPlayer.setDisplay(surfaceHolder);
         }
     }
+
 
     protected void onDestroy() {
         if (firstPlayer != null) {

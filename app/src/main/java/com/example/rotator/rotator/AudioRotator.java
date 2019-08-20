@@ -16,6 +16,8 @@ import static com.example.rotator.ConstUtils.ROTATOR;
 import static com.example.rotator.ConstUtils.VIDEO;
 
 /**
+ * 音乐轮播功能
+ *
  * @author 吴科烽
  * @date 2019-08-19
  **/
@@ -47,19 +49,22 @@ public class AudioRotator {
         return view;
     }
 
+    /**
+     * 下一首播放
+     */
     private void nextAudio() {
         if (audioIndex < audioList.size() - 1) {
             audioIndex = audioIndex + 1;
             audioPlay();
         } else {
-            audioList.clear();
-            audioIndex = 0;
-            mediaPlayer.release();
-            mediaPlayer = null;
+            onDestroy();
             sendVideoBroadcast();
         }
     }
 
+    /**
+     * 音乐播放
+     */
     private void audioPlay() {
         try {
             mediaPlayer.reset();
@@ -69,6 +74,13 @@ public class AudioRotator {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void onDestroy() {
+        audioList.clear();
+        audioIndex = 0;
+        mediaPlayer.release();
+        mediaPlayer = null;
     }
 
     private void sendVideoBroadcast() {

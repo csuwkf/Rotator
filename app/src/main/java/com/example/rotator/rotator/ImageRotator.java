@@ -24,6 +24,8 @@ import static com.example.rotator.ConstUtils.AUDIO;
 import static com.example.rotator.ConstUtils.ROTATOR;
 
 /**
+ * 图片轮播功能
+ *
  * @author 吴科烽
  * @date 2019-08-19
  **/
@@ -39,14 +41,14 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
     /**
      * 装载图片的view列表
      */
-    List<View> viewList;
+    List<View> viewList = new ArrayList<>();
     /**
      * 圆点指示器
      */
     private ImageView[] dots;
     private int currentIndex;
 
-    Timer timer;
+    Timer timer = new Timer();
     TimerTask timerTask;
     int count = 0;
     private Handler handler = new Handler() {
@@ -68,19 +70,17 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
 
     public View initView(final List<String> datas) {
         View view = inflater.inflate(R.layout.viewpager_board, null);
-        viewPagerImage = view.findViewById(R.id.vp_board);
-        viewPagerImage.addOnPageChangeListener(this);
-        viewList = new ArrayList<>();
         LinearLayout mLinearLayout = view.findViewById(R.id.ll_board_dot);
         for (int i = 0; i < datas.size(); i++) {
             viewList.add(inflater.inflate(R.layout.viewpager_item_picture, null));
             mLinearLayout.addView(inflater.inflate(R.layout.viewpager_board_dot, null));
         }
         initDots(mLinearLayout);
+        viewPagerImage = view.findViewById(R.id.vp_board);
+        viewPagerImage.addOnPageChangeListener(this);
         ViewPagerAdapter adapter = new ViewPagerAdapter(context, viewList, datas);
         viewPagerImage.setOffscreenPageLimit(3);
         viewPagerImage.setAdapter(adapter);
-        timer = new Timer();
         timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -116,6 +116,11 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
         dots[currentIndex].setEnabled(true);
     }
 
+    /**
+     * 当前状态圆点设置
+     *
+     * @param currentPage 当前页面
+     */
     private void setCurrentDot(int currentPage) {
         if (currentPage < 0 || currentPage > viewList.size() - 1 || currentIndex == currentPage) {
             return;
