@@ -10,18 +10,24 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.rotator.R;
 import com.example.rotator.ViewPagerAdapter;
 
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static com.example.rotator.ConstUtils.AUDIO;
 import static com.example.rotator.ConstUtils.ROTATOR;
+import java.util.concurrent.ThreadFactory;
+
 
 /**
  * 图片轮播功能
@@ -48,19 +54,18 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
     private ImageView[] dots;
     private int currentIndex;
 
-    Timer timer = new Timer();
-    TimerTask timerTask;
     int count = 0;
-    private Handler handler = new Handler() {
+    private Handler handler = new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == 0) {
-                int currentPage = (Integer) msg.obj;
+        public boolean handleMessage(@NonNull Message message) {
+            if (message.what == 0) {
+                int currentPage = (Integer) message.obj;
                 setCurrentDot(currentPage);
                 viewPagerImage.setCurrentItem(currentPage);
             }
+            return false;
         }
-    };
+    });
 
     public ImageRotator(Context context, LayoutInflater inflater, int timeout) {
         this.context = context;
@@ -81,13 +86,16 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
         ViewPagerAdapter adapter = new ViewPagerAdapter(context, viewList, datas);
         viewPagerImage.setOffscreenPageLimit(3);
         viewPagerImage.setAdapter(adapter);
-        timerTask = new TimerTask() {
+        ScheduledExecutorService mService = new ScheduledThreadPoolExecutor(1,
+                new BasicThreadFactory.Builder().namingPattern("example-schedule-pool-%d").daemon(true).build());
+
+        mService.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 int currentPage = count;
                 count++;
                 if (count > viewList.size()) {
-                    timerTask.cancel();
+                    mService.shutdown();
                     sendAudioBroadcast();
                 }
                 Message msg = Message.obtain();
@@ -95,8 +103,7 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
                 msg.obj = currentPage;
                 handler.sendMessage(msg);
             }
-        };
-        timer.schedule(timerTask, 0, timeout);
+        },0,timeout,TimeUnit.MILLISECONDS);
         return view;
     }
 
