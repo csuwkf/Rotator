@@ -29,7 +29,7 @@ public class AudioRotator {
     private ImageView imageView;
     private RotatorType callBackType;
 
-    public AudioRotator(Context context, LayoutInflater inflater, ArrayList<String> audioList,RotatorType callBackType) {
+    public AudioRotator(Context context, LayoutInflater inflater, ArrayList<String> audioList, RotatorType callBackType) {
         this.context = context;
         this.inflater = inflater;
         this.audioList = audioList;

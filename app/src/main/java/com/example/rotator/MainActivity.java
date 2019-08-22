@@ -62,9 +62,10 @@ public class MainActivity extends AppCompatActivity implements RotatorType{
         getFilePath(FILEPATH);
         if(imagePathList.size() == 0 && audioPathList.size() == 0 && videoPathList.size() == 0){
             showWarningDialog();
-        }else {
-            initImageView();
+            return;
         }
+        initImageView();
+
     }
 
     private void initImageView() {

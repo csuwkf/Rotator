@@ -17,9 +17,9 @@ public class VideoSizeUtils {
     public static void changeVideoSize(MediaPlayer mediaPlayer, int width, int height, Context context, SurfaceView surfaceView) {
         int deviceWidth = context.getResources().getDisplayMetrics().widthPixels;
         int deviceHeight = context.getResources().getDisplayMetrics().heightPixels;
-        Log.e(TAG, "changeVideoSize: deviceHeight=" + deviceHeight + "deviceWidth=" + deviceWidth+"width="+width+"height="+height);
+        Log.e(TAG, "changeVideoSize: deviceHeight=" + deviceHeight + "deviceWidth=" + deviceWidth + "width=" + width + "height=" + height);
         float devicePercent = 0;
-        //求屏幕比例,因为横竖屏会改变屏幕宽度值,所以为了保持更小的值除更大的值.
+        //求屏幕比例
         if (context.getResources().getConfiguration().orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             devicePercent = (float) deviceWidth / (float) deviceHeight;
         } else {
@@ -31,7 +31,7 @@ public class VideoSizeUtils {
         } else {
             if (context.getResources().getConfiguration().orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                 width = deviceWidth;
-                 //接受在宽度的轻微拉伸来满足视频铺满屏幕的优化
+                //接受在宽度的轻微拉伸来满足视频铺满屏幕的优化
                 float videoPercent = (float) width / (float) height;
                 float differenceValue = Math.abs(videoPercent - devicePercent);
                 if (differenceValue < 0.15) {
@@ -45,7 +45,9 @@ public class VideoSizeUtils {
             }
 
         }
-        Log.e(TAG, "width="+width+"height="+height);
-        surfaceView.setLayoutParams(new RelativeLayout.LayoutParams(width, height));
+        Log.e(TAG, "width=" + width + "height=" + height);
+        RelativeLayout.LayoutParams mLayoutParams = new RelativeLayout.LayoutParams(width, height);
+        mLayoutParams.setMargins(0, (deviceHeight - height) / 2, 0, (deviceHeight - height) / 2);
+        surfaceView.setLayoutParams(mLayoutParams);
     }
 }

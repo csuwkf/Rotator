@@ -42,7 +42,6 @@ public class VideoRotator implements SurfaceHolder.Callback {
     private Context context;
     private LayoutInflater inflater;
     private ArrayList<String> videoList;
-
     private RotatorType callBackType;
 
     /**
@@ -54,7 +53,7 @@ public class VideoRotator implements SurfaceHolder.Callback {
      */
     private int currentIndex = 0;
 
-    public VideoRotator(Context context, LayoutInflater inflater, ArrayList<String> videoList,RotatorType callBackType) {
+    public VideoRotator(Context context, LayoutInflater inflater, ArrayList<String> videoList, RotatorType callBackType) {
         this.context = context;
         this.inflater = inflater;
         this.videoList = videoList;
@@ -83,7 +82,6 @@ public class VideoRotator implements SurfaceHolder.Callback {
     }
 
 
-
     /**
      * 初始化播放首段视频的player
      */
@@ -100,7 +98,7 @@ public class VideoRotator implements SurfaceHolder.Callback {
         firstPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
             @Override
             public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
-                changeVideoSize(mediaPlayer,mediaPlayer.getVideoWidth(),mediaPlayer.getVideoHeight(),context,surfaceView);
+                changeVideoSize(mediaPlayer, mediaPlayer.getVideoWidth(), mediaPlayer.getVideoHeight(), context, surfaceView);
             }
         });
         cachePlayer = firstPlayer;
@@ -147,7 +145,7 @@ public class VideoRotator implements SurfaceHolder.Callback {
                     nextMediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                         @Override
                         public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
-                            changeVideoSize(mediaPlayer,mediaPlayer.getVideoWidth(),mediaPlayer.getVideoHeight(),context,surfaceView);
+                            changeVideoSize(mediaPlayer, mediaPlayer.getVideoWidth(), mediaPlayer.getVideoHeight(), context, surfaceView);
                         }
                     });
                     try {

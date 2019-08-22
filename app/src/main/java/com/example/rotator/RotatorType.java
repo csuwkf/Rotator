@@ -7,6 +7,7 @@ package com.example.rotator;
 public interface RotatorType {
     /**
      * 设置轮播器类型
+     *
      * @param type 轮播器类型
      */
     void setType(String type);

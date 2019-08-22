@@ -11,8 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:tag="board_viewpager"
-        android:orientation="vertical"
-        />
+        android:orientation="vertical" />
 
 
 </LinearLayout>

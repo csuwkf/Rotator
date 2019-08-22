@@ -3,7 +3,6 @@ package com.example.rotator.rotator;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -62,14 +61,14 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
                 int currentPage = (Integer) message.obj;
                 setCurrentDot(currentPage);
                 viewPagerImage.setCurrentItem(currentPage);
-            }else if(message.what == 1){
+            } else if (message.what == 1) {
                 callBackType.setType(AUDIO);
             }
             return false;
         }
     });
 
-    public ImageRotator(Context context, LayoutInflater inflater, int timeout,RotatorType callBackType) {
+    public ImageRotator(Context context, LayoutInflater inflater, int timeout, RotatorType callBackType) {
         this.context = context;
         this.inflater = inflater;
         this.timeout = timeout;
@@ -101,13 +100,13 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
                 if (count > viewList.size()) {
                     mService.shutdown();
                     msg.what = 1;
-                }else {
+                } else {
                     msg.what = 0;
                     msg.obj = currentPage;
                 }
                 handler.sendMessage(msg);
             }
-        },0,timeout,TimeUnit.MILLISECONDS);
+        }, 0, timeout, TimeUnit.MILLISECONDS);
         return view;
     }
 
@@ -117,14 +116,14 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
      * @param linearLayout 布局
      */
     private void initDots(LinearLayout linearLayout) {
-            dots = new ImageView[viewList.size()];
-            //循环获取小圆点指示器
-            for (int i = 0; i < viewList.size(); i++) {
-                dots[i] = (ImageView) linearLayout.getChildAt(i);
-                dots[i].setEnabled(false);
-            }
-            currentIndex = 0;
-            dots[currentIndex].setEnabled(true);
+        dots = new ImageView[viewList.size()];
+        //循环获取小圆点指示器
+        for (int i = 0; i < viewList.size(); i++) {
+            dots[i] = (ImageView) linearLayout.getChildAt(i);
+            dots[i].setEnabled(false);
+        }
+        currentIndex = 0;
+        dots[currentIndex].setEnabled(true);
     }
 
     /**
