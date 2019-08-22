@@ -1,7 +1,6 @@
 package com.example.rotator.rotator;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -14,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.rotator.R;
+import com.example.rotator.RotatorType;
 import com.example.rotator.ViewPagerAdapter;
 
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -24,9 +24,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.rotator.ConstUtils.AUDIO;
-import static com.example.rotator.ConstUtils.ROTATOR;
-import java.util.concurrent.ThreadFactory;
+import static com.example.rotator.util.ConstUtils.AUDIO;
 
 
 /**
@@ -54,6 +52,8 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
     private ImageView[] dots;
     private int currentIndex;
 
+    private RotatorType callBackType;
+
     int count = 0;
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -62,15 +62,18 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
                 int currentPage = (Integer) message.obj;
                 setCurrentDot(currentPage);
                 viewPagerImage.setCurrentItem(currentPage);
+            }else if(message.what == 1){
+                callBackType.setType(AUDIO);
             }
             return false;
         }
     });
 
-    public ImageRotator(Context context, LayoutInflater inflater, int timeout) {
+    public ImageRotator(Context context, LayoutInflater inflater, int timeout,RotatorType callBackType) {
         this.context = context;
         this.inflater = inflater;
         this.timeout = timeout;
+        this.callBackType = callBackType;
     }
 
     public View initView(final List<String> datas) {
@@ -94,13 +97,14 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
             public void run() {
                 int currentPage = count;
                 count++;
+                Message msg = Message.obtain();
                 if (count > viewList.size()) {
                     mService.shutdown();
-                    sendAudioBroadcast();
+                    msg.what = 1;
+                }else {
+                    msg.what = 0;
+                    msg.obj = currentPage;
                 }
-                Message msg = Message.obtain();
-                msg.what = 0;
-                msg.obj = currentPage;
                 handler.sendMessage(msg);
             }
         },0,timeout,TimeUnit.MILLISECONDS);
@@ -113,14 +117,14 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
      * @param linearLayout 布局
      */
     private void initDots(LinearLayout linearLayout) {
-        dots = new ImageView[viewList.size()];
-        //循环获取小圆点指示器
-        for (int i = 0; i < viewList.size(); i++) {
-            dots[i] = (ImageView) linearLayout.getChildAt(i);
-            dots[i].setEnabled(false);
-        }
-        currentIndex = 0;
-        dots[currentIndex].setEnabled(true);
+            dots = new ImageView[viewList.size()];
+            //循环获取小圆点指示器
+            for (int i = 0; i < viewList.size(); i++) {
+                dots[i] = (ImageView) linearLayout.getChildAt(i);
+                dots[i].setEnabled(false);
+            }
+            currentIndex = 0;
+            dots[currentIndex].setEnabled(true);
     }
 
     /**
@@ -150,14 +154,6 @@ public class ImageRotator implements ViewPager.OnPageChangeListener {
 
     @Override
     public void onPageScrollStateChanged(int i) {
-    }
-
-    private void sendAudioBroadcast() {
-        Intent mIntent = new Intent();
-        mIntent.setAction(ROTATOR);
-        mIntent.putExtra("data", AUDIO);
-        Log.d(TAG, mIntent.getAction());
-        context.sendBroadcast(mIntent);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.rotator;
+package com.example.rotator.util;
 
 import android.os.Environment;
 
@@ -12,7 +12,6 @@ public class ConstUtils {
     private ConstUtils() {
     }
 
-    public static final String ROTATOR = "android.intent.action.rotator";
     public static final String IMAGE = "image";
     public static final String AUDIO = "audio";
     public static final String VIDEO = "video";

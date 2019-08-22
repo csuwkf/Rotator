@@ -1,36 +1,28 @@
 package com.example.rotator.rotator;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.RequiresApi;
 
 import com.example.rotator.R;
+import com.example.rotator.RotatorType;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.example.rotator.ConstUtils.IMAGE;
-import static com.example.rotator.ConstUtils.ROTATOR;
+import static com.example.rotator.util.ConstUtils.IMAGE;
+import static com.example.rotator.util.VideoSizeUtils.changeVideoSize;
 
 /**
  * 视频轮播功能
@@ -50,6 +42,9 @@ public class VideoRotator implements SurfaceHolder.Callback {
     private Context context;
     private LayoutInflater inflater;
     private ArrayList<String> videoList;
+
+    private RotatorType callBackType;
+
     /**
      * 所有player对象的缓存
      */
@@ -59,10 +54,11 @@ public class VideoRotator implements SurfaceHolder.Callback {
      */
     private int currentIndex = 0;
 
-    public VideoRotator(Context context, LayoutInflater inflater, ArrayList<String> videoList) {
+    public VideoRotator(Context context, LayoutInflater inflater, ArrayList<String> videoList,RotatorType callBackType) {
         this.context = context;
         this.inflater = inflater;
         this.videoList = videoList;
+        this.callBackType = callBackType;
     }
 
     public View initView() {
@@ -87,6 +83,7 @@ public class VideoRotator implements SurfaceHolder.Callback {
     }
 
 
+
     /**
      * 初始化播放首段视频的player
      */
@@ -100,7 +97,12 @@ public class VideoRotator implements SurfaceHolder.Callback {
                 onVideoPlayCompleted(mediaPlayer);
             }
         });
-
+        firstPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+            @Override
+            public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
+                changeVideoSize(mediaPlayer,mediaPlayer.getVideoWidth(),mediaPlayer.getVideoHeight(),context,surfaceView);
+            }
+        });
         cachePlayer = firstPlayer;
         initNextPlayer();
         //初始化完成后，开启播放
@@ -115,6 +117,7 @@ public class VideoRotator implements SurfaceHolder.Callback {
             firstPlayer.setDataSource(videoList.get(currentIndex));
             firstPlayer.prepare();
             firstPlayer.start();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -141,6 +144,12 @@ public class VideoRotator implements SurfaceHolder.Callback {
                             onVideoPlayCompleted(mediaPlayer);
                         }
                     });
+                    nextMediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                        @Override
+                        public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
+                            changeVideoSize(mediaPlayer,mediaPlayer.getVideoWidth(),mediaPlayer.getVideoHeight(),context,surfaceView);
+                        }
+                    });
                     try {
                         nextMediaPlayer.setDataSource(videoList.get(i));
                         nextMediaPlayer.prepare();
@@ -161,13 +170,12 @@ public class VideoRotator implements SurfaceHolder.Callback {
         currentPlayer = playersCache.get(String.valueOf(++currentIndex));
         if (currentIndex == videoList.size()) {
             onDestroy();
-            sendImageBroadcast();
+            callBackType.setType(IMAGE);
         }
         if (currentPlayer != null) {
             currentPlayer.setDisplay(surfaceHolder);
         }
     }
-
 
     protected void onDestroy() {
         if (firstPlayer != null) {
@@ -191,15 +199,6 @@ public class VideoRotator implements SurfaceHolder.Callback {
         }
         currentPlayer = null;
         currentIndex = 0;
-        videoList.clear();
-    }
-
-    private void sendImageBroadcast() {
-        Intent mIntent = new Intent();
-        mIntent.setAction(ROTATOR);
-        mIntent.putExtra("data", IMAGE);
-        Log.d(TAG, mIntent.getAction());
-        context.sendBroadcast(mIntent);
     }
 
 }

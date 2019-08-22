@@ -1,19 +1,17 @@
 package com.example.rotator.rotator;
 
 import android.content.Context;
-import android.content.Intent;
 import android.media.MediaPlayer;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.example.rotator.R;
+import com.example.rotator.RotatorType;
 
 import java.util.ArrayList;
 
-import static com.example.rotator.ConstUtils.ROTATOR;
-import static com.example.rotator.ConstUtils.VIDEO;
+import static com.example.rotator.util.ConstUtils.VIDEO;
 
 /**
  * 音乐轮播功能
@@ -29,11 +27,13 @@ public class AudioRotator {
     private LayoutInflater inflater;
     private int audioIndex = 0;
     private ImageView imageView;
+    private RotatorType callBackType;
 
-    public AudioRotator(Context context, LayoutInflater inflater, ArrayList<String> audioList) {
+    public AudioRotator(Context context, LayoutInflater inflater, ArrayList<String> audioList,RotatorType callBackType) {
         this.context = context;
         this.inflater = inflater;
         this.audioList = audioList;
+        this.callBackType = callBackType;
     }
 
     public View initView() {
@@ -46,6 +46,7 @@ public class AudioRotator {
             }
         });
         audioPlay();
+
         return view;
     }
 
@@ -58,7 +59,7 @@ public class AudioRotator {
             audioPlay();
         } else {
             onDestroy();
-            sendVideoBroadcast();
+            callBackType.setType(VIDEO);
         }
     }
 
@@ -77,18 +78,9 @@ public class AudioRotator {
     }
 
     private void onDestroy() {
-        audioList.clear();
         audioIndex = 0;
         mediaPlayer.release();
         mediaPlayer = null;
-    }
-
-    private void sendVideoBroadcast() {
-        Intent mIntent = new Intent();
-        mIntent.setAction(ROTATOR);
-        mIntent.putExtra("data", VIDEO);
-        context.sendBroadcast(mIntent);
-        Log.d(TAG, mIntent.getAction());
     }
 }
 
