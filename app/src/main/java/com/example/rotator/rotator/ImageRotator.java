@@ -33,7 +33,6 @@ import static com.example.rotator.util.ConstUtils.AUDIO;
  * @date 2019-08-19
  **/
 public class ImageRotator implements ViewPager.OnPageChangeListener {
-    private static final String TAG = "ImageRotator";
     private ViewPager viewPagerImage;
     private Context context;
     private LayoutInflater inflater;

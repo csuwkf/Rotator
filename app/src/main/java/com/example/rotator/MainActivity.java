@@ -98,8 +98,6 @@ public class MainActivity extends AppCompatActivity implements RotatorType{
         linearLayoutBoardViewpager.addView(videoRotator.initView());
     }
 
-
-
     /**
      * 读写权限检查判断
      *
